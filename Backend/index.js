@@ -18,7 +18,7 @@ const URI = process.env.MongoDBURI;
 
 // connect to mongoDB
 try {
-    mongoose.connect(URI, {
+    mongoose.connect(`${URI}/book-store`, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
     });
