@@ -1,1 +1,22 @@
 node_modules
+.env
+dist
+.DS_Store
+.vscode
+npm-debug.log
+yarn-error.log
+.idea
+
+# Ignore build output
+build/
+coverage/
+logs/
+*.log
+temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+*.old
+*.orig
+*.rej
