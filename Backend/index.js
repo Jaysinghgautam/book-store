@@ -1,4 +1,4 @@
-import express from "express";
+ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -6,39 +6,55 @@ import cors from "cors";
 import bookRoute from "./route/book.route.js";
 import userRoute from "./route/user.route.js";
 
-const app = express();
-
-app.use(cors({
-  origin: "http://localhost:5168", // ✅ Add missing colon after 'http'
-  credentials: true               // ✅ Correct spelling: 'credentials'
-}));
-
-app.use(express.json());
-
 dotenv.config();
+const app = express();
 
 const PORT = process.env.PORT || 4000;
 const URI = process.env.MongoDBURI;
 
-// connect to mongoDB
-try {
-    mongoose.connect(`${URI}/book-store`, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
-    console.log("Connected to mongoDB");
-} catch (error) {
-    console.log("Error: ", error);
-}
+// ✅ CORS configuration
+const allowedOrigins = [
+  "http://localhost:5173",               // Dev
+  "https://book-store-one-woad.vercel.app" // Prod
+];
 
-// defining routes
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
+
+app.use(express.json());
+
+// ✅ Connect to MongoDB (async + error handling)
+const connectDB = async () => {
+  try {
+    await mongoose.connect(`${URI}/store`, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("✅ Connected to MongoDB");
+  } catch (error) {
+    console.error("❌ MongoDB connection error:", error.message);
+    process.exit(1); // stop app if DB not connected
+  }
+};
+connectDB();
+
+// ✅ Routes
 app.use("/book", bookRoute);
 app.use("/user", userRoute);
 
-app.get('/',(req,res)=> {
-    res.send("hello from backend");
-})
+app.get("/", (req, res) => {
+  res.send("Hello from backend 🚀");
+});
 
-app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
+// ✅ Start server
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
